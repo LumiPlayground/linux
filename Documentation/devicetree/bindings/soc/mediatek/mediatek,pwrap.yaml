@@ -31,6 +31,7 @@ properties:
       - items:
           - enum:
               - mediatek,mt2701-pwrap
+              - mediatek,mt6735-pwrap
               - mediatek,mt6765-pwrap
               - mediatek,mt6779-pwrap
               - mediatek,mt6795-pwrap
@@ -117,7 +118,31 @@ allOf:
       properties:
         compatible:
           contains:
+<<<<<<< HEAD
             const: mediatek,mt8365-pwrap
+=======
+            enum:
+              - mediatek,mt2701-pwrap
+              - mediatek,mt6735-pwrap
+              - mediatek,mt6765-pwrap
+              - mediatek,mt6797-pwrap
+              - mediatek,mt7622-pwrap
+              - mediatek,mt8135-pwrap
+              - mediatek,mt8173-pwrap
+    then:
+      required:
+        - resets
+        - reset-names
+    else:
+      properties:
+        resets: false
+        reset-names: false
+  - if:
+      properties:
+        compatible:
+          contains:
+            const: mediatek,mt8135-pwrap
+>>>>>>> dc4be226301e0 (dt-bindings: mediatek: pwrap: Add MT6735 compatible)
     then:
       properties:
         clocks:
