@@ -4,16 +4,20 @@
  * Author: James Liao <jamesjj.liao@mediatek.com>
  */
 
+#include <linux/clk.h>
 #include <linux/delay.h>
 #include <linux/device.h>
 #include <linux/io.h>
+#include <linux/mfd/syscon.h>
 #include <linux/module.h>
 #include <linux/of.h>
 #include <linux/platform_device.h>
+#include <linux/regmap.h>
 #include <linux/reset-controller.h>
 #include <linux/soc/mediatek/mtk-mmsys.h>
 
 #include "mtk-mmsys.h"
+#include "mt6735-mmsys.h"
 #include "mt8167-mmsys.h"
 #include "mt8173-mmsys.h"
 #include "mt8183-mmsys.h"
@@ -35,6 +39,14 @@ static const struct mtk_mmsys_driver_data mt2712_mmsys_driver_data = {
 	.clk_driver = "clk-mt2712-mm",
 	.routes = mmsys_default_routing_table,
 	.num_routes = ARRAY_SIZE(mmsys_default_routing_table),
+};
+
+static const struct mtk_mmsys_driver_data mt6735_mmsys_driver_data = {
+	.clk_driver = "clk-mt6735-mm",
+	.routes = mt6735_mmsys_routing_table,
+	.num_routes = ARRAY_SIZE(mt6735_mmsys_routing_table),
+	.sw0_rst_offset = MT6735_MMSYS_SW0_RST_B,
+	.num_resets = 96,
 };
 
 static const struct mtk_mmsys_driver_data mt6779_mmsys_driver_data = {
@@ -389,6 +401,8 @@ static int mtk_mmsys_probe(struct platform_device *pdev)
 	struct platform_device *clks;
 	struct platform_device *drm;
 	struct mtk_mmsys *mmsys;
+	struct clk *clk;
+	struct regmap *regmap;
 	int ret;
 
 	mmsys = devm_kzalloc(dev, sizeof(*mmsys), GFP_KERNEL);
@@ -400,6 +414,23 @@ static int mtk_mmsys_probe(struct platform_device *pdev)
 		ret = PTR_ERR(mmsys->regs);
 		dev_err(dev, "Failed to ioremap mmsys registers: %d\n", ret);
 		return ret;
+	}
+
+	clk = devm_clk_get_optional(dev, NULL);
+	if (IS_ERR(clk))
+		return dev_err_probe(dev, PTR_ERR(clk), "Failed to get clock: %pe\n", clk);
+
+	/* Attach MMSYS control register clock to regmap if provided */
+	if (clk) {
+		regmap = device_node_to_regmap(dev->of_node);
+		if (IS_ERR(regmap))
+			return dev_err_probe(dev, PTR_ERR(regmap), "Failed to get regmap: %pe\n",
+					     regmap);
+
+		ret = regmap_mmio_attach_clk(regmap, clk);
+		if (ret)
+			return dev_err_probe(dev, ret, "Failed to attach clock: %pe\n",
+					     ERR_PTR(ret));
 	}
 
 	mmsys->data = of_device_get_match_data(&pdev->dev);
@@ -457,6 +488,7 @@ static void mtk_mmsys_remove(struct platform_device *pdev)
 static const struct of_device_id of_match_mtk_mmsys[] = {
 	{ .compatible = "mediatek,mt2701-mmsys", .data = &mt2701_mmsys_driver_data },
 	{ .compatible = "mediatek,mt2712-mmsys", .data = &mt2712_mmsys_driver_data },
+	{ .compatible = "mediatek,mt6735-mmsys", .data = &mt6735_mmsys_driver_data },
 	{ .compatible = "mediatek,mt6779-mmsys", .data = &mt6779_mmsys_driver_data },
 	{ .compatible = "mediatek,mt6795-mmsys", .data = &mt6795_mmsys_driver_data },
 	{ .compatible = "mediatek,mt6797-mmsys", .data = &mt6797_mmsys_driver_data },
