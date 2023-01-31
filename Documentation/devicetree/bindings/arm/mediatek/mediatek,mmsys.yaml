@@ -25,6 +25,7 @@ properties:
               - mediatek,mt2712-mmsys
               - mediatek,mt6765-mmsys
               - mediatek,mt6779-mmsys
+              - mediatek,mt6735-mmsys
               - mediatek,mt6795-mmsys
               - mediatek,mt6797-mmsys
               - mediatek,mt8167-mmsys
@@ -97,6 +98,20 @@ required:
   - compatible
   - reg
   - "#clock-cells"
+
+if:
+  properties:
+    compatible:
+      contains:
+        const: mediatek,mt6735-mmsys
+then:
+  properties:
+    clocks:
+      description:
+        Clock for MMSYS control registers
+      maxItems: 1
+  required:
+    - clocks
 
 additionalProperties: false
 
