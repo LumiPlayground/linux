@@ -110,6 +110,11 @@
 	status = "okay";
 };
 
+/* Secondary CPUs are broken on this platform due to firmware issues */
+/delete-node/ &cpu1;
+/delete-node/ &cpu2;
+/delete-node/ &cpu3;
+
 &disp_mutex {
 	status = "okay";
 };
