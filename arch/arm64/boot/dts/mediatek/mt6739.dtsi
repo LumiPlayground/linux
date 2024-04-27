@@ -5,6 +5,7 @@
 
 #include <dt-bindings/interrupt-controller/irq.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/pinctrl/mediatek,mt6739-pinfunc.h>
 
 / {
     compatible = "mediatek,mt6739";
@@ -102,6 +103,28 @@
         #size-cells = <2>;
         compatible = "simple-bus";
         ranges;
+
+        pio: pinctrl@10005000 {
+            compatible = "mediatek,mt6739-pinctrl";
+            reg = <0 0x10005000 0 0x1000>,
+                  <0 0x10002000 0 0x200>,
+                  <0 0x10002200 0 0x200>,
+                  <0 0x10002400 0 0x200>,
+                  <0 0x10002600 0 0x200>,
+                  <0 0x10002800 0 0x200>,
+                  <0 0x10002a00 0 0x200>,
+                  <0 0x10002c00 0 0x200>,
+                  <0 0x1000b000 0 0x200>;
+            reg-names = "gpio", "iocfg_lt", "iocfg_lm", "iocfg_lb",
+                  "iocfg_bl", "iocfg_bm", "iocfg_rb", "iocfg_rt",
+                  "eint";
+            gpio-controller;
+            #gpio-cells = <2>;
+            gpio-ranges = <&pio 0 0 168>;
+            interrupt-controller;
+            interrupts = <GIC_SPI 168 IRQ_TYPE_LEVEL_HIGH>;
+            #interrupt-cells = <2>;
+        };
 
         gic: interrupt-controller@0c000000 {
             compatible = "arm,gic-v3";
