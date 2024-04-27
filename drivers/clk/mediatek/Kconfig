@@ -173,6 +173,38 @@ config COMMON_CLK_MT6735_VENCSYS
 	  This enables a driver for clocks provided by vencsys
 	  on the MediaTek MT6735 SoC.
 
+config COMMON_CLK_MT67639
+       bool "Clock driver for MediaTek MT6739"
+       depends on (ARCH_MEDIATEK && ARM64) || COMPILE_TEST
+       select COMMON_CLK_MEDIATEK
+       default ARCH_MEDIATEK && ARM64
+       help
+         This driver supports MediaTek MT6739 basic clocks.
+
+config COMMON_CLK_MT6739_AUDIOSYS
+       tristate "Clock driver for MediaTek MT6765 audiosys"
+       depends on COMMON_CLK_MT6739
+       help
+         This driver supports MediaTek MT6739 audiosys clocks.
+
+config COMMON_CLK_MT6739_MMSYS
+       tristate "Clock driver for MediaTek MT6739 mmsys"
+       depends on COMMON_CLK_MT6739
+       help
+         This driver supports MediaTek MT6739 mmsys clocks.
+
+config COMMON_CLK_MT6739_IMGSYS
+       tristate "Clock driver for MediaTek MT6739 imgsys"
+       depends on COMMON_CLK_MT6739
+       help
+         This driver supports MediaTek MT6739 imgsys clocks.
+
+config COMMON_CLK_MT6739_VCODECSYS
+       tristate "Clock driver for MediaTek MT6739 vcodecsys"
+       depends on COMMON_CLK_MT6739
+       help
+         This driver supports MediaTek MT6739 vcodecsys clocks.
+
 config COMMON_CLK_MT6765
        bool "Clock driver for MediaTek MT6765"
        depends on (ARCH_MEDIATEK && ARM64) || COMPILE_TEST
